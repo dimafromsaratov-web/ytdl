@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой Скачиватель</title>
-    <!-- Подключение официального скрипта взаимодействия с Telegram -->
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -47,6 +46,30 @@
             font-weight: bold;
             cursor: pointer;
         }
+        button:disabled { opacity: 0.6; }
+        #result {
+            margin-top: 25px;
+            display: none;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 12px 24px;
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .loader {
+            display: none;
+            margin: 15px 0;
+            font-style: italic;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -54,24 +77,57 @@
         <h2>📥 Личный Скачиватель</h2>
         <p>Вставьте ссылку на видео (YouTube, VK, TikTok, Rutube):</p>
         <input type="text" id="videoUrl" placeholder="https://... ">
-        <button onclick="sendLinkToBot()">Скачать видео через бота</button>
+        <button id="getBtn" onclick="getLink()">Сгенерировать ссылку</button>
+        
+        <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю видео...</div>
+        
+        <div id="result">
+            <b id="videoTitle">Файл успешно подготовлен!</b><br><br>
+            <a id="downloadLink" class="download-btn" href="#" target="_blank">📥 СКАЧАТЬ MP4</a>
+        </div>
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
-        function sendLinkToBot() {
+        async function getLink() {
             const url = document.getElementById('videoUrl').value.trim();
             if (!url) return alert('Пожалуйста, вставьте ссылку!');
             
-            // Отправляем ссылку текстовым сообщением обратно в чат бота
-            tg.sendData(url);
+            const loader = document.getElementById('loader');
+            const resultDiv = document.getElementById('result');
+            const getBtn = document.getElementById('getBtn');
             
-            // Автоматически закрываем мини-приложение, чтобы вернуться в чат
-            tg.close();
+            loader.style.display = 'block';
+            resultDiv.style.display = 'none';
+            getBtn.disabled = true;
+
+            try {
+                // Используем открытый и стабильный шлюз дешифрации без ограничений CORS
+                const response = await fetch('https://allorigins.win' + encodeURIComponent('https://jup.io' + url));
+                const json = await response.json();
+                const data = JSON.parse(json.contents);
+                
+                // Проверяем наличие прямой ссылки на скачивание в ответе сервера
+                if (data && data.url) {
+                    document.getElementById('downloadLink').href = data.url;
+                    resultDiv.style.display = 'block';
+                } else if (data && data.formats && data.formats.length > 0) {
+                    // Если форматов несколько, берем первый попавшийся MP4
+                    const mp4File = data.formats.find(f => f.ext === 'mp4' || f.container === 'mp4') || data.formats[0];
+                    document.getElementById('downloadLink').href = mp4File.url;
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert('Не удалось извлечь видеопоток. Попробуйте обновить ссылку.');
+                }
+            } catch (e) {
+                alert('Ошибка соединения с сервером дешифрации. Попробуйте ещё раз.');
+            } finally {
+                loader.style.display = 'none';
+                getBtn.disabled = false;
+            }
         }
     </script>
 </body>
