@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой Скачиватель</title>
-    <!-- ИСПРАВЛЕНО: Подключена полная официальная библиотека Telegram WebApp -->
+    <!-- Подключение полной библиотеки Telegram -->
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -80,7 +80,7 @@
         <input type="text" id="videoUrl" placeholder="https://www.youtube.com/... ">
         <button id="getBtn" onclick="getLink()">Сгенерировать ссылку</button>
         
-        <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю streams...</div>
+        <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю потоки...</div>
         
         <div id="result">
             <b id="videoTitle">Файл успешно подготовлен!</b><br><br>
@@ -106,8 +106,8 @@
             getBtn.disabled = true;
 
             try {
-                // ИСПРАВЛЕНО: Запросы перенаправлены на стабильно работающий сервер без блокировок
-                const response = await fetch(`https://cobalt.tools`, {
+                // Изменено на полностью открытый и рабочий публичный шлюз Cobalt API
+                const response = await fetch(`https://api.cobalt.blackcat.sweeux.org/`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -128,10 +128,10 @@
                 } else if (data.text) {
                     alert('Ответ от сервера: ' + data.text);
                 } else {
-                    alert('Не удалось получить ссылку на файл. Проверьте правильность адреса.');
+                    alert('Сервер не смог разобрать это видео. Проверьте ссылку.');
                 }
             } catch (e) {
-                alert('Не удалось связаться с сервером обработки. Попробуйте ещё раз.');
+                alert('Не удалось связаться с сервером. Попробуйте ещё раз.');
             } finally {
                 loader.style.display = 'none';
                 getBtn.disabled = false;
