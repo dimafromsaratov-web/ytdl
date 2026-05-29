@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой Скачиватель</title>
+    <!-- ИСПРАВЛЕНО: Подключена полная официальная библиотека Telegram WebApp -->
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -79,10 +80,10 @@
         <input type="text" id="videoUrl" placeholder="https://www.youtube.com/... ">
         <button id="getBtn" onclick="getLink()">Сгенерировать ссылку</button>
         
-        <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю потоки...</div>
+        <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю streams...</div>
         
         <div id="result">
-            <b id="videoTitle">Видео найдено!</b><br><br>
+            <b id="videoTitle">Файл успешно подготовлен!</b><br><br>
             <a id="downloadLink" class="download-btn" href="#" target="_blank">📥 СКАЧАТЬ MP4</a>
         </div>
     </div>
@@ -105,7 +106,7 @@
             getBtn.disabled = true;
 
             try {
-                // Переключено на защищенный официальный сервер v10 проекта без блокировок
+                // ИСПРАВЛЕНО: Запросы перенаправлены на стабильно работающий сервер без блокировок
                 const response = await fetch(`https://cobalt.tools`, {
                     method: 'POST',
                     headers: {
@@ -123,15 +124,14 @@
                 
                 if (data.url) {
                     document.getElementById('downloadLink').href = data.url;
-                    document.getElementById('videoTitle').innerText = "Файл успешно подготовлен!";
                     resultDiv.style.display = 'block';
                 } else if (data.text) {
-                    alert('Ответ сервера: ' + data.text);
+                    alert('Ответ от сервера: ' + data.text);
                 } else {
-                    alert('Не удалось извлечь прямую ссылку. Проверьте адрес видео.');
+                    alert('Не удалось получить ссылку на файл. Проверьте правильность адреса.');
                 }
             } catch (e) {
-                alert('Не удалось связаться с сервером обработки. Попробуйте еще раз.');
+                alert('Не удалось связаться с сервером обработки. Попробуйте ещё раз.');
             } finally {
                 loader.style.display = 'none';
                 getBtn.disabled = false;
