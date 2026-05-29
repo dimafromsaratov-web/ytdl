@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Скачиватель</title>
+    <title>Скачать Видео</title>
     <script src="https://telegram.org"></script>
     <style>
         body {
@@ -76,7 +76,7 @@
     <div class="container">
         <h2>📥 Личный Скачиватель</h2>
         <p>Вставьте ссылку на видео (YouTube, VK, TikTok, Rutube):</p>
-        <input type="text" id="videoUrl" placeholder="https://youtube.com... ">
+        <input type="text" id="videoUrl" placeholder="https://www.youtube.com/... ">
         <button id="getBtn" onclick="getLink()">Сгенерировать ссылку</button>
         
         <div class="loader" id="loader">Пожалуйста, подождите, расшифровываю потоки...</div>
@@ -88,7 +88,6 @@
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
@@ -106,8 +105,8 @@
             getBtn.disabled = true;
 
             try {
-                // Используем бесплатный публичный API дешифратор движка yt-dlp
-                const response = await fetch(`https://cobalt.tools`, {
+                // Переключено на основной стабильный рабочий прокси-сервер проекта
+                const response = await fetch(`https://wuk.sh`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -123,10 +122,10 @@
                     document.getElementById('videoTitle').innerText = "Файл готов в максимальном качестве!";
                     resultDiv.style.display = 'block';
                 } else {
-                    alert('Не удалось извлечь видео. Попробуйте другую ссылку.');
+                    alert('Сервер отклонил эту ссылку. Убедитесь, что она открытая.');
                 }
             } catch (e) {
-                alert('Ошибка сервера. Попробуйте позже.');
+                alert('Не удалось связаться с сервером дешифрации. Попробуйте еще раз.');
             } finally {
                 loader.style.display = 'none';
                 getBtn.disabled = false;
